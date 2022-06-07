@@ -25,21 +25,44 @@ def add_csv():
             product_price = clean_price(row[1])
             product_quantity = int(row[2])
             date_updated = clean_date(row[3])
-        
-            add = True
 
             if product_in_db != None:
-                if product_in_db.date_updated >= date_updated:
+                if product_in_db.date_updated < date_updated:
+                    product_in_db.product_name = product_name
+                    product_in_db.product_price = product_price
+                    product_in_db.product_quantity = product_quantity
+                    product_in_db.date_updated = date_updated
                     
-                    add = False
-                else:
-                    session.delete(product_in_db)
             
-            if add:
+            else:
                 product_to_add = Product(product_name=product_name, product_quantity=product_quantity, product_price=product_price, date_updated=date_updated)
                 session.add(product_to_add)
-                session.commit()
+            
+            session.commit()
                     
+
+def view():
+    available_ids = []
+    for product in session.query(Product):
+            available_ids.append(product.id)
+
+    print(f'Available IDs: \n{available_ids}')
+    id_choice = input('>')
+
+    while not id_choice.isdigit() or int(id_choice) not in available_ids:
+        print()
+        print('Please only choose one of the IDs above')
+        id_choice = input('>')
+    
+    print()
+    chosen_product = session.query(Product).filter_by(id=id_choice).first()
+    print(f'Name: {chosen_product.product_name}')
+    print(f'Quantity: {chosen_product.product_quantity}')
+    print(f'Price: ${chosen_product.product_price / 100}')
+    print(f"Date Updated: {chosen_product.date_updated.strftime('%m/%d/%Y')}")
+
+
+
 
 def menu():
     print()
@@ -49,15 +72,16 @@ def menu():
     print('b - make a backup of the database')
     print("------------------") 
     print()
-    choice = input('> ')
+    choice = input('>')
+    print()
     choice = choice.lower()
     while choice not in ['v', 'a', 'b']:
         print('Please only choose one of the options above')
         choice = input('> ')
-    
+        print()
+
     if choice == 'v':
-        # view
-        pass
+        view()
 
     elif choice == 'a':
         # add
