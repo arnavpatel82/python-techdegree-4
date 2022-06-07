@@ -15,6 +15,15 @@ def clean_date(date_updated):
     return (datetime.datetime.strptime(date_updated, '%m/%d/%Y')) 
 
 
+def undo_clean_price(product_price):
+    price = int(product_price) / 100
+    return '$' + str(price) 
+
+
+def undo_clean_date(date_updated):
+    return date_updated.strftime('%m/%d/%Y')
+
+
 def add_csv():
     with open('inventory.csv') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
@@ -32,7 +41,7 @@ def add_csv():
                     product_in_db.product_price = product_price
                     product_in_db.product_quantity = product_quantity
                     product_in_db.date_updated = date_updated
-                    print('product already in database, information updated')
+                    # print('product already in database, information updated')
             else:
                 product_to_add = Product(product_name=product_name, product_quantity=product_quantity, product_price=product_price, date_updated=date_updated)
                 session.add(product_to_add)
@@ -108,39 +117,60 @@ def add():
 
     session.commit()
 
-    
+
+def backup():
+    with open('inventory_backup.csv', mode='w') as csv_file:
+        fieldnames = ['product_name', 'product_price', 'product_quantity', 'date_updated']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for product in session.query(Product):
+            writer.writerow({
+                'product_name': product.product_name, 
+                'product_price': undo_clean_price(product.product_price), 
+                'product_quantity': product.product_quantity,
+                'date_updated': undo_clean_date(product.date_updated)
+                })
+
+    print("Backup file generated as 'inventory_backup.csv'")
+
+
 def menu():
-    print()
-    print("------ MENU ------")        
-    print('v - view the details of a single product in the database')
-    print('a - add a new product to the database')
-    print('b - make a backup of the database')
-    print("------------------") 
-    print()
-    choice = input('>')
-    print()
-    choice = choice.lower()
-    while choice not in ['v', 'a', 'b']:
-        print('Please only choose one of the options above')
-        choice = input('> ')
+    while True:
         print()
+        print("------ MENU ------")        
+        print('v - view the details of a single product in the database')
+        print('a - add a new product to the database')
+        print('b - make a backup of the database')
+        print('q - exit the program')
+        print("------------------") 
+        print()
+        choice = input('>')
+        print()
+        choice = choice.lower()
+        while choice not in ['v', 'a', 'b', 'q']:
+            print('Please only choose one of the options above')
+            choice = input('> ')
+            print()
 
-    if choice == 'v':
-        view()
-        input('press enter to return to menu')
+        if choice == 'v':
+            view()
+            input('press enter to return to menu')
 
-    elif choice == 'a':
-        add()
-        input('press enter to return to menu')
+        elif choice == 'a':
+            add()
+            input('press enter to return to menu')
 
-    else:
-        # backup
-        pass
+        elif choice == 'b':
+            backup()
+            input('press enter to return to menu')
 
+        else:
+            print('Program exited')
+            break
 
 
 if __name__ == "__main__":
-    # Base.metadata.create_all(engine)
-    # add_csv()
-    while True:
-        menu()
+    Base.metadata.create_all(engine)
+    add_csv()
+    menu()
