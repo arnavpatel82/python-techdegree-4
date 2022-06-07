@@ -15,7 +15,7 @@ def clean_date(date_updated):
     return (datetime.datetime.strptime(date_updated, '%m/%d/%Y')) 
 
 
-def read_csv():
+def add_csv():
     with open('inventory.csv') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         next(csv_reader)
@@ -40,9 +40,36 @@ def read_csv():
                 session.add(product_to_add)
                 session.commit()
                     
-                
+
+def menu():
+    print()
+    print("------ MENU ------")        
+    print('v - view the details of a single product in the database')
+    print('a - add a new product to the database')
+    print('b - make a backup of the database')
+    print("------------------") 
+    print()
+    choice = input('> ')
+    choice = choice.lower()
+    while choice not in ['v', 'a', 'b']:
+        print('Please only choose one of the options above')
+        choice = input('> ')
+    
+    if choice == 'v':
+        # view
+        pass
+
+    elif choice == 'a':
+        # add
+        pass
+
+    else:
+        # backup
+        pass
+
 
 
 if __name__ == "__main__":
-    Base.metadata.create_all(engine)
-    read_csv()
+    # Base.metadata.create_all(engine)
+    # add_csv()
+    menu()
