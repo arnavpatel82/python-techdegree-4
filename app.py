@@ -36,7 +36,7 @@ def add_csv():
             date_updated = clean_date(row[3])
 
             if product_in_db != None:
-                if product_in_db.date_updated < date_updated:
+                if product_in_db.date_updated <= date_updated:
                     product_in_db.product_name = product_name
                     product_in_db.product_price = product_price
                     product_in_db.product_quantity = product_quantity
