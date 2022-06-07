@@ -110,6 +110,8 @@ def add():
             product_in_db.product_quantity = product_quantity
             product_in_db.date_updated = date_updated
             print('product already in database, information updated')
+        else:
+            print('same product already exists in the database with a more recent date updated')
     else:
         product_to_add = Product(product_name=product_name, product_quantity=product_quantity, product_price=product_price, date_updated=date_updated)
         session.add(product_to_add)
