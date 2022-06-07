@@ -104,7 +104,7 @@ def add():
             print('date updated must be in this format --> MM/DD/YYYY')
 
     if product_in_db != None:
-        if product_in_db.date_updated < date_updated:
+        if product_in_db.date_updated <= date_updated:
             product_in_db.product_name = product_name
             product_in_db.product_price = product_price
             product_in_db.product_quantity = product_quantity
